@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br" ng-app="listaTelefonica">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script src="angular.js"></script>
+
+    <style>
+        .jumbotron {
+            width: 400px;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            margin-top: 20px;
+        }
+
+        .selecionado {
+            background-color: yellow;
+        }
+
+        .negrito {
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        angular.module("listaTelefonica", []);
+
+        //ng-controler faz vinculo entre a view e o controller onde nasce a relação do scope
+
+        angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope) {
+            $scope.app = "Lista Telefonica";
+            $scope.contatos = [
+                { nome: 'Pedro', telefone: 99999999 },
+                { nome: 'Ana', telefone: 88888888 },
+                { nome: 'Maria', telefone: 77777777 }
+            ];
+
+            $scope.operadoras = [
+                { nome: 'Oi', codigo: 23, categoria: "Celular" },
+                { nome: 'Vivo', codigo: 12, categoria: "Celular" },
+                { nome: 'Tim', codigo: 34, categoria: "Celular" },
+                { nome: 'GVT', codigo: 21, categoria: "Fixo" },
+                { nome: 'Net', codigo: 24, categoria: "Fixo" }
+            ];
+
+            $scope.adicionarContato = function (contato) {
+                $scope.contatos.push(angular.copy(contato));//angular.copy diz que essa é uma cópia e não pode ser alterada em tempo real
+                delete $scope.contato //deleta do escopo para que não seja replicada sempre na hora do click
+            };
+
+            $scope.apagarContatos = function (contatos) {
+
+                //Se o contato estiver selecionado ele reatribui na lista com o resultado dos não selecionados
+                $scope.contatos = contatos.filter(function (contato) {
+                    if (!contato.selecionado) return contato
+                });
+
+                //console.log($scope.contatos)Debug
+
+            }
+
+            $scope.isContatoSelecionado = function (contatos) {
+                //console.log(contatos);
+
+                //some = algum; Retorna true se houver algum elemento que se encaixa em SELECIONADO
+                return contatos.some(function (contato) {
+                    return contato.selecionado;
+                });
+
+                //console.log(debug)
+            }
+
+            $scope.classe1 = "selecionado";
+            $scope.classe2 = "negrito";
+        })
+
+    </script>
+
+    <title>Lista Telefonica</title>
+</head>
+
+<body ng-controller="listaTelefonicaCtrl">
+
+
+    <div class="jumbotron">
+        <!--
+        <h4 ng-bind="app">
+            
+                g-bind Substitui o elemento por uma expressão
+            
+        </h4>
+        -->
+
+        <h4>
+            {{app}}
+        </h4>
+
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Operadora</th>
+            </tr>
+
+            <!--ng-style e ng-class: aplicando estilos dinamicamente
+                se usarmos [] podemos aplicar mais de uma classe
+            -->
+
+            <!--A classe selecionado e negrito só são aplicadas quando o contato.selecionado for true-->
+            <tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos">
+                <!-- ng-repeat Iterando sobre os itens de uma coleção de objetos -->
+
+                <td><input type="checkbox" ng-model="contato.selecionado"></td>
+
+                <td>{{contato.nome}}</td>
+
+                <td>{{contato.telefone}}</td>
+
+                <td>{{contato.operadora.nome}}</td>
+            </tr>
+        </table>
+
+        <hr>
+        <!--//ng-model vincula uma propriedade ao scope-->
+        <input class="form-control" type="text" ng-model="contato.nome" placeholder="Nome">
+        <input class="form-control" type="text" ng-model="contato.telefone" placeholder="Telefone">
+        <!-- ng-option percorre o nome dos elementos em operadoras -->
+
+        <select class="form-control" ng-model="contato.operadora"
+            ng-options="operadora.nome group by operadora.categoria for operadora in operadoras">
+            <!--
+            A gente definiu a model operadora, que vai receber todas as operadoras definidas, pelo ng-options
+            operadora.codigo as operadora.nome... define que o value dela será o código, importante dependendo da requsição do back end
+            group by ele separa por categoria
+            -->
+
+            <!--default-->
+            <option value="">Selecione uma operadora</option>
+
+
+        </select>
+
+        <!-- //ng-clock atribuindo um comportamento ao evento 
+            //ng-disabled - desabilita algum elemento desabilitavel
+        -->
+        <button class="btn btn-primary btn-block" ng-click="adicionarContato(contato)"
+            ng-disabled="!contato.nome || !contato.telefone || !contato.operadora ">Adicionar
+            Contato</button>
+
+        <button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)"
+            ng-disabled="!isContatoSelecionado(contatos)">Apagar Contatos</button>
+
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

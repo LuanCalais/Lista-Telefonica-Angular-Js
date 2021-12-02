@@ -40,20 +40,21 @@
 
         //ng-controler faz vinculo entre a view e o controller onde nasce a relação do scope
 
-        angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope) {
+        angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope, $filter) {
+            //$filter importa qualquer tipo de fitro, é mais interessante aplica-los na controler por questões performáticas
             $scope.app = "Lista Telefonica";
             $scope.contatos = [
-                { nome: 'Pedro', telefone: 99999999 },
+                { nome: $filter('uppercase')("Pedro"), telefone: 99999999 },
                 { nome: 'Ana', telefone: 88888888 },
                 { nome: 'Maria', telefone: 77777777 }
             ];
 
             $scope.operadoras = [
-                { nome: 'Oi', codigo: 23, categoria: "Celular", cor: "blue" },
-                { nome: 'Vivo', codigo: 12, categoria: "Celular", cor: "yellow" },
-                { nome: 'Tim', codigo: 34, categoria: "Celular", cor: "red" },
-                { nome: 'GVT', codigo: 21, categoria: "Fixo", cor: "black" },
-                { nome: 'Net', codigo: 24, categoria: "Fixo", cor: "orange" }
+                { nome: 'Oi', codigo: 23, data: new Date(), categoria: "Celular", cor: "blue", preco: 2 },
+                { nome: 'Vivo', codigo: 12, data: new Date(), categoria: "Celular", cor: "yellow", preco: 3 },
+                { nome: 'Tim', codigo: 34, data: new Date(), categoria: "Celular", cor: "red", preco: 4 },
+                { nome: 'GVT', codigo: 21, data: new Date(), categoria: "Fixo", cor: "black", preco: 1 },
+                { nome: 'Net', codigo: 24, data: new Date(), categoria: "Fixo", cor: "orange", preco: 3 }
             ];
 
             $scope.adicionarContato = function (contato) {
@@ -78,6 +79,11 @@
                 //console.log(debug)
             }
 
+            $scope.ordernarPor = function () {
+                $scope.criteroDeOrdenacao = campo;
+                $scope.direcaoOrdenacao = !$scope.direcaoOrdenacao;
+            }
+
             $scope.classe1 = "selecionado";
             $scope.classe2 = "negrito";
         })
@@ -91,6 +97,8 @@
 
 
     <div class="jumbotron">
+        <!--Filtros-->
+        <input class="form-control" type="text" ng-model="criterioDeBusca" placeholder="o que vc está buscando">
         <!--
         <h4 ng-bind="app">
                 g-bind Substitui o elemento por uma expressão
@@ -104,10 +112,12 @@
         <table ng-show="contatos.length > 0" class="table">
             <tr>
                 <th></th>
-                <th>Nome</th>
-                <th>Telefone</th>
+                <th></th>
+                <th href="" ng-click="ordernarPor()">Nome</th>
+                <th ng-click="ordernarPor()">Telefone</th>
                 <th>Operadora</th>
                 <th></th>
+                <th>Data</th>
             </tr>
 
             <!--ng-style e ng-class: aplicando estilos dinamicamente
@@ -115,20 +125,27 @@
             -->
 
             <!--A classe selecionado e negrito só são aplicadas quando o contato.selecionado for true-->
-            <tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos">
+            <!--filter para filtrar
+                orderby ordena array por base em critérios + asc, - dsc, reverse true: asc, reverse false: dsc
+
+                IMPORTANTE SABER QUE NO FILTRO ELE VAI ACUMULANDO O FILTRO ANTERIOR AS VEZES É NECESSÁRIO PUXALO PRA TRÁS PARA NÃO BUGAR
+            -->
+            <tr ng-class="{'selecionado negrito': contato.selecionado}"
+                ng-repeat="contato in contatos | limitTo: 2 | filter:criterioDeBusca | orderBy: criterioDeOrdenacao: direcaoOrdenacao ">
                 <!-- ng-repeat Iterando sobre os itens de uma coleção de objetos -->
 
                 <td><input type="checkbox" ng-model="contato.selecionado"></td>
 
-                <td>{{contato.nome}}</td>
+                <td>{{contato.nome | uppercase}}</td>
 
                 <td>{{contato.telefone}}</td>
 
-                <td>{{contato.operadora.nome}}</td>
+                <td>{{contato.operadora.nome | lowercase}}</td>
                 <td>
                     <div style="width: 20px; height: 20px;" ng-style="{'background-color': contatos.cor}">
                     </div>
                 </td>
+                <td>{{contato.data | data: 'dd/MM/yyyy HH:mm'}}</td>
             </tr>
         </table>
 
@@ -137,7 +154,27 @@
         Válido: {{contatoForm.$valid}}
         Inválido: {{contatoForm.$invalid}}
         <!--
+            validações: 
             ng-minlength ng-maxlength - validação por tamanho
+             pristine e dirty - propriedades booleanas que indica se o campo já foi tocado ou não
+            pristine é intocado
+            dirty já foi tocado
+            $error - consultando os erros de um campo ou formulário
+
+            $error + a validação que quebou
+
+
+            ng-pattern - define uma RegExp para validar campo, tipo específico
+            /^\d{4,5}-\d{4}$/ entre digitos de 4 a 5 - 4 digitos e as barras definem o tamanho
+
+            ng-minlength ng-maxlength - validação por tamanho
+
+            filtros: 
+            uppercase - letras maiúsculas
+            lowrcase - letras minúsculas
+            currency - converte um número para moeda
+            number - formata em número
+            limitTo - limita tamanho de um array ou uma string
         -->
         <form name="contatoForm">
             <!--//ng-model vincula uma propriedade ao scope-->
@@ -148,7 +185,7 @@
             <!-- ng-option percorre o nome dos elementos em operadoras -->
 
             <select class="form-control" ng-model="contato.operadora"
-                ng-options="operadora.nome group by operadora.categoria for operadora in operadoras"
+                ng-options="operadora.nome +'(' + (operadora.preco | currency) + ')' group by operadora.categoria for operadora in operadoras | orderBy: 'nome'"
                 name="operadoraForm" ng-required="true">
                 <!--
             A gente definiu a model operadora, que vai receber todas as operadoras definidas, pelo ng-options
@@ -160,25 +197,6 @@
                 <option value="">Selecione uma operadora</option>
             </select>
         </form>
-
-        <!--
-            pristine e dirty - propriedades booleanas que indica se o campo já foi tocado ou não
-            pristine é intocado
-            dirty já foi tocado
-
-            ng-minlength ng-maxlength - validação por tamanho
-        -->
-
-        <!--
-            $error - consultando os erros de um campo ou formulário
-
-            $error + a validação que quebou
-
-
-
-            ng-pattern - define uma RegExp para validar campo, tipo específico
-            /^\d{4,5}-\d{4}$/ entre digitos de 4 a 5 - 4 digitos e as barras definem o tamanho
-        -->
 
         <!--ng-messages-->
         <div ng-messages="contatoForm.nomeForm.$error">
@@ -210,6 +228,8 @@
         <div ng-show="contatoForm.telefoneForm.$error.pattern && contatoForm.operadoraForm.$dirty"
             class="alert alert-danger">O campo telefone deve ter o formato 9999-9999
         </div>
+        <!--number-->
+        {{ 100.96 | number:2}}
 
         <!-- //ng-clock atribuindo um comportamento ao evento 
             //ng-disabled - desabilita algum elemento desabilitavel

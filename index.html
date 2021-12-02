@@ -11,6 +11,7 @@
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <script src="angular.js"></script>
+    <script src="angular-messages.js"></script>
 
     <style>
         .jumbotron {
@@ -34,8 +35,8 @@
         }
     </style>
 
-    <script>
-        angular.module("listaTelefonica", []);
+    <script>                    //importando modulo externo de ng-messages
+        angular.module("listaTelefonica", ["ngMessages"]);
 
         //ng-controler faz vinculo entre a view e o controller onde nasce a relação do scope
 
@@ -58,27 +59,22 @@
             $scope.adicionarContato = function (contato) {
                 $scope.contatos.push(angular.copy(contato));//angular.copy diz que essa é uma cópia e não pode ser alterada em tempo real
                 delete $scope.contato //deleta do escopo para que não seja replicada sempre na hora do click
+                $scope.contatoForm.$setPristine();//Pristine define que depois de ser adicionado ele volta a ser um input virgem 
             };
 
             $scope.apagarContatos = function (contatos) {
-
                 //Se o contato estiver selecionado ele reatribui na lista com o resultado dos não selecionados
                 $scope.contatos = contatos.filter(function (contato) {
                     if (!contato.selecionado) return contato
                 });
-
-                //console.log($scope.contatos)Debug
-
             }
 
             $scope.isContatoSelecionado = function (contatos) {
                 //console.log(contatos);
-
                 //some = algum; Retorna true se houver algum elemento que se encaixa em SELECIONADO
                 return contatos.some(function (contato) {
                     return contato.selecionado;
                 });
-
                 //console.log(debug)
             }
 
@@ -97,9 +93,7 @@
     <div class="jumbotron">
         <!--
         <h4 ng-bind="app">
-            
                 g-bind Substitui o elemento por uma expressão
-            
         </h4>
         -->
 
@@ -139,30 +133,89 @@
         </table>
 
         <hr>
-        <!--//ng-model vincula uma propriedade ao scope-->
-        <input class="form-control" type="text" ng-model="contato.nome" placeholder="Nome">
-        <input class="form-control" type="text" ng-model="contato.telefone" placeholder="Telefone">
-        <!-- ng-option percorre o nome dos elementos em operadoras -->
 
-        <select class="form-control" ng-model="contato.operadora"
-            ng-options="operadora.nome group by operadora.categoria for operadora in operadoras">
-            <!--
+        Válido: {{contatoForm.$valid}}
+        Inválido: {{contatoForm.$invalid}}
+        <!--
+            ng-minlength ng-maxlength - validação por tamanho
+        -->
+        <form name="contatoForm">
+            <!--//ng-model vincula uma propriedade ao scope-->
+            <input class="form-control" type="text" name="nomeForm" ng-model="contato.nome" placeholder="Nome"
+                ng-required="true" ng-minlength="10">
+            <input class="form-control" type="text" name="telefoneForm" ng-model="contato.telefone"
+                placeholder="Telefone" ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/">
+            <!-- ng-option percorre o nome dos elementos em operadoras -->
+
+            <select class="form-control" ng-model="contato.operadora"
+                ng-options="operadora.nome group by operadora.categoria for operadora in operadoras"
+                name="operadoraForm" ng-required="true">
+                <!--
             A gente definiu a model operadora, que vai receber todas as operadoras definidas, pelo ng-options
             operadora.codigo as operadora.nome... define que o value dela será o código, importante dependendo da requsição do back end
             group by ele separa por categoria
             -->
 
-            <!--default-->
-            <option value="">Selecione uma operadora</option>
+                <!--default-->
+                <option value="">Selecione uma operadora</option>
+            </select>
+        </form>
+
+        <!--
+            pristine e dirty - propriedades booleanas que indica se o campo já foi tocado ou não
+            pristine é intocado
+            dirty já foi tocado
+
+            ng-minlength ng-maxlength - validação por tamanho
+        -->
+
+        <!--
+            $error - consultando os erros de um campo ou formulário
+
+            $error + a validação que quebou
 
 
-        </select>
+
+            ng-pattern - define uma RegExp para validar campo, tipo específico
+            /^\d{4,5}-\d{4}$/ entre digitos de 4 a 5 - 4 digitos e as barras definem o tamanho
+        -->
+
+        <!--ng-messages-->
+        <div ng-messages="contatoForm.nomeForm.$error">
+
+            <!-- <div ng-show="contatoForm.nomeForm.$error.required && contatoForm.nomeForm.$dirty"
+                class="alert alert-danger">
+                Por favor
+                preencha o nome</div>
+            <div ng-show="contatoForm.nomeForm.$error.minlength && contatoForm.nomeForm.$dirty"
+                class="alert alert-danger">O
+                campo
+                nome deve ter no mínimo 10 caracteres</div> -->
+
+            <div ng-message="required" class="alert alert-danger">
+                Por favor
+                preencha o nome</div>
+            <div ng-message="minlength" class="alert alert-danger">O
+                campo
+                nome deve ter no mínimo 10 caracteres</div>
+        </div>
+
+        <div ng-show="contatoForm.telefoneForm.$error.required && contatoForm.telefoneForm.$dirty"
+            class="alert alert-danger">
+            Por favor preencha o telefone
+        </div>
+        <div ng-show="contatoForm.operadoraForm.$error.required && contatoForm.operadoraForm.$dirty"
+            class="alert alert-danger">Por favor preencha a operadora
+        </div>
+        <div ng-show="contatoForm.telefoneForm.$error.pattern && contatoForm.operadoraForm.$dirty"
+            class="alert alert-danger">O campo telefone deve ter o formato 9999-9999
+        </div>
 
         <!-- //ng-clock atribuindo um comportamento ao evento 
             //ng-disabled - desabilita algum elemento desabilitavel
         -->
         <button class="btn btn-primary btn-block" ng-click="adicionarContato(contato)"
-            ng-disabled="!contato.nome || !contato.telefone || !contato.operadora ">Adicionar
+            ng-disabled="contatoForm.$invalid">Adicionar
             Contato</button>
 
         <button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)"
@@ -175,7 +228,7 @@
     </div>
 
     <!--ng-include inclui elemento dinamicamente-->
-    <div ng-include="'footer.html'"></div>
+    <!-- <div ng-include="'footer.html'"></div> -->
 
 
 

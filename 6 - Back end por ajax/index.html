@@ -1,0 +1,193 @@
+<html ng-app="listaTelefonica">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Telefonica</title>
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script src="angular.js"></script>
+    <script src="angular-messages.js"></script>
+
+    <style>
+        .jumbotron {
+            width: 600px;
+            text-align: center;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h3 {
+            margin-bottom: 30px;
+        }
+
+        .table {
+            margin-top: 20px;
+        }
+
+        .form-control {
+            margin-bottom: 5px;
+        }
+
+        .selecionado {
+            background-color: yellow;
+        }
+
+        .negrito {
+            font-weight: bold;
+        }
+
+        hr {
+            border-color: #999;
+        }
+    </style>
+
+    <script>
+        angular.module("listaTelefonica", ["ngMessages"]);                                        //injentando serviço $http
+        angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope, uppercaseFilter, $http) {
+            $scope.app = "Lista Telefonica";
+            $scope.contatos = [];
+            $scope.operadoras = [];
+
+            //function que vai carregar os contatos com $http
+            var carregarContatos = function () {
+                $http.get("http://localhost:3412/contatos").success(function (data, status) {
+                    $scope.contatos = data;//com isso e ele definido na view, já irá renderizar 
+                }); //Json de exemplo, não está funcionando
+            }
+
+            //function que vai carregar as operadoras
+            var carregarOperadoras = function () {
+                $http.get("http://localhost:3412/operadoras").success(function (data, status) {
+                    $scope.operadoras = data;
+
+                    //tratamento de erro de retorno
+                }).error(function (data, status) {
+                    $scope.message = "Aconteceu um problema " + data
+                });
+            }
+
+            $scope.adicionarContato = function (contato) {
+
+                //Envés de push, utilizar post para mandar para o backend(url, config)
+                $http.post("http://localhost:3412/contatos", contatos).success(function (data) {
+                    delete $scope.contato;
+                    $scope.contatoForm.$setPristine();
+                    carregarContatos();
+                });
+
+                //MANEIRA ANTIGA SEM INTEGRAÇÃO COM O BECK END
+                // $scope.contatos.push(angular.copy(contato));
+
+            };
+            $scope.apagarContatos = function (contatos) {
+                $scope.contatos = contatos.filter(function (contato) {
+                    if (!contato.selecionado) return contato;
+                });
+            };
+            $scope.isContatoSelecionado = function (contatos) {
+                return contatos.some(function (contato) {
+                    return contato.selecionado;
+                });
+            };
+            $scope.ordenarPor = function (campo) {
+                $scope.criterioDeOrdenacao = campo;
+                $scope.direcaoDaOrdenacao = !$scope.direcaoDaOrdenacao;
+            };
+
+            //obrigatório realizar a chamada das functions
+            carregarContatos();
+            carregarOperadoras();
+        });
+    </script>
+</head>
+
+<body ng-controller="listaTelefonicaCtrl">
+    <div class="jumbotron">
+        <h3>{{app}}</h3>
+        {{message}}
+        <input class="form-control" type="text" ng-model="criterioDeBusca" placeholder="O que você está buscando?" />
+        <table ng-show="contatos.length > 0" class="table table-striped">
+            <tr>
+                <th></th>
+                <th><a href="" ng-click="ordenarPor('nome')">Nome</a></th>
+                <th><a href="" ng-click="ordenarPor('telefone')">Telefone</a></th>
+                <th>Operadora</th>
+                <th>Data</th>
+            </tr>
+            <tr ng-class="{'selecionado negrito': contato.selecionado}"
+                ng-repeat="contato in contatos | filter:criterioDeBusca | orderBy:criterioDeOrdenacao:direcaoDaOrdenacao">
+                <td><input type="checkbox" ng-model="contato.selecionado" /></td>
+                <td>{{contato.nome}}</td>
+                <td>{{contato.telefone}}</td>
+                <td>{{contato.operadora.nome | lowercase}}</td>
+                <td>{{contato.data | date:'dd/MM/yyyy HH:mm'}}</td>
+            </tr>
+        </table>
+        <hr />
+        <form name="contatoForm">
+            <input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome"
+                ng-required="true" ng-minlength="10" />
+            <input class="form-control" type="text" ng-model="contato.telefone" name="telefone" placeholder="Telefone"
+                ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+            <select class="form-control" ng-model="contato.operadora"
+                ng-options="operadora.nome + ' ( ' + (operadora.preco | currency) + ' )' for operadora in operadoras | orderBy:'nome'">
+                <option value="">Selecione uma operadora</option>
+            </select>
+        </form>
+
+        <div ng-show="contatoForm.nome.$dirty" ng-messages="contatoForm.nome.$error">
+            <div ng-message="required" class="alert alert-danger">
+                Por favor, preencha o campo nome!
+            </div>
+            <div ng-message="minlength" class="alert alert-danger">
+                O campo nome deve ter no mínimo 10 caracteres.
+            </div>
+        </div>
+
+        <div ng-show="contatoForm.telefone.$error.required && contatoForm.telefone.$dirty" class="alert alert-danger">
+            Por favor, preencha o campo telefone!
+        </div>
+        <div ng-show="contatoForm.telefone.$error.pattern" class="alert alert-danger">
+            O campo telefone deve ter o formato DDDDD-DDDD.
+        </div>
+        <button class="btn btn-primary btn-block" ng-click="adicionarContato(contato)"
+            ng-disabled="contatoForm.$invalid">Adicionar Contato</button>
+        <button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)"
+            ng-if="isContatoSelecionado(contatos)">Apagar Contatos</button>
+    </div>
+    <!-- <div ng-include="'footer.html'"></div> -->
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
+
+<!-- ANOTAÇÕES
+    $http - O serviço permite a realização de requisições utilizando 
+    HMLHttpRequest ou via JSONP
+
+    get(url, config)
+    post(url, data, config)
+    put(url, data, config)
+    delete(url, data, config)
+    head(url, config)
+    jsonp(url, config)
+
+
+    JSONP - JSON with padding, é uma estrategia para burlarmos o mecanismo de bloqueio do browser que não nos permite 
+    acessar JSONs por exemplo, fora do nosso localhost (recursos externos)
+
+    CORS - Cross-Origin Resource Sharing, Permissão para acessar recuros externos por meio de cabeçalhos HTTP adicionais
+-->

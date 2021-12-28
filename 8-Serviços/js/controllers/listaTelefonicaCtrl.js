@@ -1,21 +1,40 @@
-angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope, uppercaseFilter) {
+angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope, uppercaseFilter, contatosAPI) {
     $scope.app = "Lista Telefonica";
-    $scope.contatos = [
-        { nome: uppercaseFilter("Pedro"), telefone: "9999-8888", data: new Date(), operadora: { nome: "Oi", codigo: 14, categoria: "Celular" } },
-        { nome: "Ana", telefone: "9999-8877", data: new Date(), operadora: { nome: "Vivo", codigo: 15, categoria: "Celular" } },
-        { nome: "Maria", telefone: "9999-8866", data: new Date(), operadora: { nome: "Tim", codigo: 41, categoria: "Celular" } }
-    ];
-    $scope.operadoras = [
-        { nome: "Oi", codigo: 14, categoria: "Celular", preco: 2 },
-        { nome: "Vivo", codigo: 15, categoria: "Celular", preco: 1 },
-        { nome: "Tim", codigo: 41, categoria: "Celular", preco: 3 },
-        { nome: "GVT", codigo: 25, categoria: "Fixo", preco: 1 },
-        { nome: "Embratel", codigo: 21, categoria: "Fixo", preco: 2 }
-    ];
+    $scope.contatos = [];
+    $scope.operadoras = [];
+
+
+    var carregarContatos = function () {
+        // Chamando o metodo get da service "Factory"
+        contatosAPI.getContatos().success(function (data, status) {
+            $scope.contatos = data;
+        }).error(function (data, status) {
+            $scope.message = "Aconteceu um problema: " + data;
+        })
+    }
+
+    // Utilizando construtora de um "Service"
+    var carregarOperadoras = function () {
+        operadorasAPI.getOperadoras().success(function (data, status) {
+            $scope.operadoras = data;
+
+        }).error(function (data, status) {
+            $scope.message = "Aconteceu um problema " + data
+        });
+    }
+
     $scope.adicionarContato = function (contato) {
-        $scope.contatos.push(angular.copy(contato));
-        delete $scope.contato;
-        $scope.contatoForm.$setPristine();
+
+        // provider        service          metodo
+        contato.serial = serialGenerator.generate();
+        contato.data = new Date();
+        // Chamando o metodo post da service "Factory"
+        contatosAPI.saveContato(contato).success(function (data) {
+            delete $scope.contato;
+            $scope.contatoForm.$setPristine();
+            carregarContatos();
+        });
+
     };
     $scope.apagarContatos = function (contatos) {
         $scope.contatos = contatos.filter(function (contato) {
@@ -31,4 +50,7 @@ angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($s
         $scope.criterioDeOrdenacao = campo;
         $scope.direcaoDaOrdenacao = !$scope.direcaoDaOrdenacao;
     };
+
+    carregarContatos();
+    carregarOperadoras();
 });

@@ -13,6 +13,26 @@
     <script src="lib/angular-messages.js"></script>
     <script src="js/app.js"></script>
     <script src="js/controllers/listaTelefonicaCtrl.js"></script>
+    <script src="js/controllers/services/contatosApiService.js"></script>
+    <script src="js/controllers/services/operadorasApiService.js"></script>
+    <script src="js/controllers/services/configValues.js"></script>
+    <script src="js/controllers/services/serialGeneratorService.js"></script>
+    <script src="js/config/serialGeneratorConfig.js"></script>
+
+    <!--
+
+        Serviço é um singleton, ou seja, um objeto único, criado na inicialização da aplicação 
+        e que está disponível para ser injetado em outros componentes 
+
+         Tipos de serviços: 
+
+         - Factory(Fábrica): para fabricar certas necessidades, similar a criação de uma função criadora de objetos em js, get post
+         - Service(Construtora): similar a uma função construtora 
+         - Value: Objetos de configuração para a aplicação
+         - Provider: serviço que dá origem a todos os outros, factory mais complexa, mas nos da a habilidade de configura-lo
+         - Config: Utilizado para configurar os providers
+         - Constant: Utilizado como value os, pode ser injetado em providers
+    -->
 </head>
 
 <body ng-controller="listaTelefonicaCtrl">
@@ -23,6 +43,7 @@
         <table ng-show="contatos.length > 0" class="table table-striped">
             <tr>
                 <th></th>
+                <th>Serial</th>
                 <th><a href="" ng-click="ordenarPor('nome')">Nome</a></th>
                 <th><a href="" ng-click="ordenarPor('telefone')">Telefone</a></th>
                 <th>Operadora</th>
@@ -31,6 +52,7 @@
             <tr ng-class="{'selecionado negrito': contato.selecionado}"
                 ng-repeat="contato in contatos | filter:criterioDeBusca | orderBy:criterioDeOrdenacao:direcaoDaOrdenacao">
                 <td><input type="checkbox" ng-model="contato.selecionado" /></td>
+                <td>{{contato.serial}}</td>
                 <td>{{contato.nome}}</td>
                 <td>{{contato.telefone}}</td>
                 <td>{{contato.operadora.nome | lowercase}}</td>

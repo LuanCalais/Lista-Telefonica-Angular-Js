@@ -2,7 +2,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Criando diretivas parte 2</title>
+	<title>Diretivas Parte 2</title>
 	<link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css/app.css">
 	<link rel="stylesheet" type="text/css" href="css/ui.css">
@@ -18,19 +18,33 @@
 	<script src="js/filters/nameFilter.js"></script>
 	<script src="js/filters/ellipsisFilter.js"></script>
 	<script src="js/directives/uiAlertDirective.js"></script>
+	<script src="js/directives/uiDateDirective.js"></script>
+
+	<!-- 
+		
+		Diretivas de máscara
+
+		link - Executada depois do template ter sido compilado, podemos utilizá-la para interagir 
+		com a DOM, tratando eventos ou mesmo para definir o comportamento associado com a lógica da diretiva
+
+		require - Estabelece um vínculo com outra diretiva, interagindo por meio do controller, que é um dos parâmetros
+		da função "link"
+
+	 -->
+
 </head>
 
 <body ng-controller="listaTelefonicaCtrl">
 	<div class="jumbotron">
+
+		{{$id}}
+
 		<h3>{{app}}</h3>
 
-		<ui-alert title="Ops, aconteceu um problema!">
+		<ui-alert title="Ops, aconteceu um problema!" message="error">
 			{{error}}
 		</ui-alert>
 
-		<ui-alert title="Série sobre AngularJS">
-			Episódio 10 - Criando Diretivas - Parte 1
-		</ui-alert>
 
 		<input class="form-control" type="text" ng-model="criterioDeBusca" placeholder="O que você está buscando?" />
 		<table ng-show="contatos.length > 0" class="table table-striped">
@@ -58,6 +72,9 @@
 				ng-required="true" ng-minlength="10" />
 			<input class="form-control" type="text" ng-model="contato.telefone" name="telefone" placeholder="Telefone"
 				ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+
+			<!-- ui-date para utilizar a mask -->
+			<input class="form-control" type="text" ng-model="contato.data" name="data" placeholder="Data" ui-date>
 			<select class="form-control" ng-model="contato.operadora"
 				ng-options="operadora.nome + ' ( ' + (operadora.preco | currency) + ' )' for operadora in operadoras | orderBy:'nome'">
 				<option value="">Selecione uma operadora</option>

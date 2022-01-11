@@ -12,14 +12,18 @@
 	<script src="js/controllers/listaTelefonicaCtrl.js"></script>
 	<script src="js/services/contatosAPIService.js"></script>
 	<script src="js/services/operadorasAPIService.js"></script>
-	<script src="js/services/serialGeneratorService.js"></script>
+	<!-- <script src="js/services/serialGeneratorService.js"></script> serviço apagado pois agr está em modulo externo na lib -->
+	<!-- Importação do serial Generator de modulo externo -->
+	<script src="lib/serialGenerator/serialGenerator.js"></script>
 	<script src="js/config/serialGeneratorConfig.js"></script>
 	<script src="js/value/configValue.js"></script>
 	<script src="js/filters/nameFilter.js"></script>
 	<script src="js/filters/ellipsisFilter.js"></script>
 	<script src="js/directives/uiAlertDirective.js"></script>
 	<script src="js/directives/uiDateDirective.js"></script>
-	<script src="js/directives/uiAcordionDirective.js"></script>
+	<!-- <script src="js/directives/uiAcordionDirective.js"></script>  serviço apagado pois agr está em modulo externo na lib -->
+	<!-- Importação do serial ui de modulo externo -->
+	<script src="lib/ui/ui.js"></script>
 
 	<!-- 
 		
@@ -28,7 +32,24 @@
 		- Reuso
 		- Organização
 		- Performance
-		- Isolamento 
+		- Isolamento
+
+		------------------------------------------------------------------
+		os templates sendo usados de modo externo podem ser um problema organizacional
+		pelas pequenas partes em cada arquivo, ocasionando uma amarração de pastas
+		muito grande. 
+
+		$templateCache - utilizado para guardar um template. Na primeira vez que um 
+		template é carregado, ele é armazenado em cache e acessível por meio do
+		serviço $templateCache. Toda vez que um tamplete é referenciado seja por ng-view
+		ou templateUrl, o templateCache é utilizado
+		
+		
+		Inicialização de um módulo 
+		criando um block run
+		
+		Exemplo:
+		app.run(funcion(){})
 
 	 -->
 

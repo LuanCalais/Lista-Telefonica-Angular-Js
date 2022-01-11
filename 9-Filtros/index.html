@@ -1,7 +1,8 @@
 <html ng-app="listaTelefonica">
+
 <head>
 	<meta charset="UTF-8">
-	<title>Lista Telefonica</title>
+	<title>Filtros</title>
 	<link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css/app.css">
 	<script src="lib/angular/angular.js"></script>
@@ -15,12 +16,28 @@
 	<script src="js/value/configValue.js"></script>
 	<script src="js/filters/nameFilter.js"></script>
 	<script src="js/filters/ellipsisFilter.js"></script>
+
+	<!-- 
+		Filtros - Transformam o resultado de uma expressão, realizando operações como a formatação de data, 
+		a conversão de moeda e a  ordenação de array
+
+		Filtro Name - Converter nomes, escritos totalmente em letra minúscula ou maiúscula, deixando apenas a primeira letra
+		maiúscula e as outras minúsculas
+		Exemplo: joão da silva -> João Da Silva
+
+		Filtro Elipsis - Limita quantidade de caracteres de uma String, incluindo "..." no final, se necessário, com base
+		no tamanho passado por parâmetro
+		Exemplo: João da Sil...
+
+	 -->
+
 </head>
+
 <body ng-controller="listaTelefonicaCtrl">
 	<div class="jumbotron">
 		<h3>{{app}}</h3>
 		{{message}}
-		<input class="form-control" type="text" ng-model="criterioDeBusca" placeholder="O que você está buscando?"/>
+		<input class="form-control" type="text" ng-model="criterioDeBusca" placeholder="O que você está buscando?" />
 		<table ng-show="contatos.length > 0" class="table table-striped">
 			<tr>
 				<th></th>
@@ -30,20 +47,27 @@
 				<th>Operadora</th>
 				<th>Data</th>
 			</tr>
-			<tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos | filter:criterioDeBusca | orderBy:criterioDeOrdenacao:direcaoDaOrdenacao">
-				<td><input type="checkbox" ng-model="contato.selecionado"/></td>
+			<tr ng-class="{'selecionado negrito': contato.selecionado}"
+				ng-repeat="contato in contatos | filter:criterioDeBusca | orderBy:criterioDeOrdenacao:direcaoDaOrdenacao">
+				<td><input type="checkbox" ng-model="contato.selecionado" /></td>
 				<td>{{contato.serial}}</td>
+				<!-- Assim aplicamos os filtros, é importante saber que eles e acumulam, o filtro ellipsis está sendo aplicado
+					em cima do que já foi filtrado pelo filtro name, da esquerda para a direita
+				-->
 				<td>{{contato.nome | name | ellipsis:10}}</td>
 				<td>{{contato.telefone}}</td>
 				<td>{{contato.operadora.nome}}</td>
 				<td>{{contato.data | date:'dd/MM/yyyy HH:mm'}}</td>
 			</tr>
 		</table>
-		<hr/>
+		<hr />
 		<form name="contatoForm">
-			<input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome" ng-required="true" ng-minlength="10"/>
-			<input class="form-control" type="text" ng-model="contato.telefone" name="telefone" placeholder="Telefone" ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/"/>
-			<select class="form-control" ng-model="contato.operadora" ng-options="operadora.nome + ' ( ' + (operadora.preco | currency) + ' )' for operadora in operadoras | orderBy:'nome'">
+			<input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome"
+				ng-required="true" ng-minlength="10" />
+			<input class="form-control" type="text" ng-model="contato.telefone" name="telefone" placeholder="Telefone"
+				ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+			<select class="form-control" ng-model="contato.operadora"
+				ng-options="operadora.nome + ' ( ' + (operadora.preco | currency) + ' )' for operadora in operadoras | orderBy:'nome'">
 				<option value="">Selecione uma operadora</option>
 			</select>
 		</form>
@@ -63,10 +87,12 @@
 		<div ng-show="contatoForm.telefone.$error.pattern" class="alert alert-danger">
 			O campo telefone deve ter o formato DDDDD-DDDD.
 		</div>
-		<button class="btn btn-primary btn-block" ng-click="adicionarContato(contato)" ng-disabled="contatoForm.$invalid">Adicionar Contato</button>
-		<button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)" ng-if="isContatoSelecionado(contatos)">Apagar Contatos</button>
+		<button class="btn btn-primary btn-block" ng-click="adicionarContato(contato)"
+			ng-disabled="contatoForm.$invalid">Adicionar Contato</button>
+		<button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)"
+			ng-if="isContatoSelecionado(contatos)">Apagar Contatos</button>
 	</div>
 	<div ng-include="'view/footer.html'"></div>
 </body>
-</html>
 
+</html>

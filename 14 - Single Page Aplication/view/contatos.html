@@ -52,7 +52,8 @@
             ng-repeat="contato in contatos | filter:criterioDeBusca | orderBy:criterioDeOrdenacao:direcaoDaOrdenacao">
             <td><input type="checkbox" ng-model="contato.selecionado" /></td>
             <td>{{contato.serial}}</td>
-            <td>{{contato.nome | name | ellipsis:10}}</td>
+            <!-- link que acessa os detalhes do contato em questão -->
+            <td><a href="#/detalhesContato/{{contato.id}}">{{contato.nome | name | ellipsis:10}}</a></td>
             <td>{{contato.telefone}}</td>
             <td>{{contato.operadora.nome}}</td>
             <td>{{contato.data | date:'dd/MM/yyyy HH:mm'}}</td>

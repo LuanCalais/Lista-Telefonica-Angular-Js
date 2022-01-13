@@ -39,6 +39,18 @@ angular.module("listaTelefonica").config(function ($routeProvider) {
         }
     });
 
+    // Para acessar os detalhes do contato com "contato/1 por exemplo"
+    $routeProvider.when("/detalhesContato/:id", {
+        templateUrl: "view/detalhesContato.html",
+        controller: "detalhesContatoCtrl",
+        resolve: {
+            // É necessário pegar a rota tmb para saber para onde ir usando o id
+            contato: function (contatosAPI, $route) {
+                return contatosAPI.getContato($route.current.params.id);
+            }
+        }
+    });
+
     //Se não for encontrada nenhuma rota, esta será a página padrão
     $routeProvider.otherwise({ redirectTo: "/contatos" });
 

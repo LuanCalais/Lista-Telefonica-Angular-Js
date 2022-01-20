@@ -1,0 +1,83 @@
+<div class="jumbotron">
+
+    <ui-acordions>
+
+        <ui-acordion title="Acordion 1">
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+            industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
+            scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap
+            into
+            electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
+            release of
+            Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like
+            Aldus PageMaker including versions of Lorem Ipsum.
+        </ui-acordion>
+
+        <ui-acordion title="Acordion 2">
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+            industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
+            scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap
+            into
+            electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
+            release of
+            Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like
+            Aldus PageMaker including versions of Lorem Ipsum.
+        </ui-acordion>
+
+        <ui-acordion title="Acordion 3">
+        </ui-acordion>
+
+    </ui-acordions>
+
+    {{$id}}
+
+    <h3>{{app}}</h3>
+
+    <ui-alert title="Ops, aconteceu um problema!" message="error">
+        {{error}}
+    </ui-alert>
+
+    <input class="form-control" type="text" ng-model="criterioDeBusca"
+        ng-model-options="{updateOn = 'default blur', debounce:{default: 500, blur: 0}}"
+        placeholder="O que você está buscando?" />
+
+
+    <table ng-show="contatos.length > 0" class="table table-striped">
+        <tr>
+            <th></th>
+            <th>Serial</th>
+            <th><a href="" ng-click="ordenarPor('nome')">Nome</a></th>
+            <th><a href="" ng-click="ordenarPor('telefone')">Telefone</a></th>
+            <th>Operadora</th>
+
+            <th>Preço</th>
+            <th>Data</th>
+        </tr>
+        <tr ng-class="{'selecionado negrito': contato.selecionado}"
+            ng-repeat="contato in contatos | filter:criterioDeBusca | orderBy:criterioDeOrdenacao:direcaoDaOrdenacao track by contato.id">
+            <!-- Uso de track by -->
+
+            <td><input type="checkbox" ng-model="contato.selecionado" ng-click="verificarContatoSelecionado()" /></td>
+            <td>{{::contato.serial}}</td>
+            <td><a href="#/detalhesContato/{{contato.id}}">{{contato.nome | name | ellipsis:10}}</a></td>
+            <td>{{::contato.telefone}}</td>
+            <td>{{::contato.operadora.nome}}</td>
+            <td>{{calcularImposto(contato.operadora.preco) | currency}}</td>
+
+            <td>{{contato.operadora.precoComImporto | currency}}</td>
+
+
+            <td>{{contato.data | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+    </table>
+    <hr />
+
+    <!-- Demonstração de performance melhorada -->
+    <button class="btn btn-primary" ng-click="reset()">Reseta</button>
+
+    <a href="#/novoContato" class="btn btn-primary btn-block">Novo Contato</a>
+
+    <button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)" ng-if="hasContatoSelecionado">Apagar
+        Contatos</button>>
+
+</div>

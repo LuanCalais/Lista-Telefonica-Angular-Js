@@ -1,9 +1,55 @@
 <div class="jumbotron">
     <form name="contatoForm">
-        <input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome"
-            ng-required="true" ng-minlength="10" />
-        <input class="form-control" type="text" ng-model="contato.telefone" name="telefone" placeholder="Telefone"
-            ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+
+
+
+        <!-- Demonstração do uso de ng-if e show e a performance -->
+        <select class="form-control" ng-model="contato.tipo">
+            <option value="">Selecione o tipo</option>
+            <option value="">Pessoa Física</option>
+            <option value="">Pessoa Jurídica</option>
+        </select>
+
+        <!-- 26 Watchers ativos -->
+        <!-- Ng-if -->
+        <div ng-if="contato.tipo==='Pessoa Física">
+            <input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome"
+                ng-required="true" ng-minlength="10" />
+            <input class="form-control" type="text" ng-model="contato.cpf" name="telefone" placeholder="CPF"
+                ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+        </div>
+
+        <!-- 24 Watchers ativos -->
+        <!-- Ng-if -->
+        <div ng-if="contato.tipo==='Pessoa Jurídica">
+            <input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome Fantasia"
+                ng-required="true" ng-minlength="10" />
+            <input class="form-control" type="text" ng-model="contato.CNPJ" name="telefone" placeholder="CNPJ"
+                ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+            <input class="form-control" type="text" ng-model="contato.razaoSocial" name="telefone"
+                placeholder="Razão Social" ng-required="true">
+        </div>
+
+        <!-- 5x mais rápido pois não interage na DOM, os elementos já estão renderizados -->
+        <!-- Ng-show -->
+        <div ng-show="contato.tipo==='Pessoa Física">
+            <input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome"
+                ng-required="true" ng-minlength="10" />
+            <input class="form-control" type="text" ng-model="contato.cpf" name="telefone" placeholder="CPF"
+                ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+        </div>
+
+        <!-- Ng-show -->
+        <div ng-show="contato.tipo==='Pessoa Jurídica">
+            <input class="form-control" type="text" ng-model="contato.nome" name="nome" placeholder="Nome Fantasia"
+                ng-required="true" ng-minlength="10" />
+            <input class="form-control" type="text" ng-model="contato.CNPJ" name="telefone" placeholder="CNPJ"
+                ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/" />
+            <input class="form-control" type="text" ng-model="contato.razaoSocial" name="telefone"
+                placeholder="Razão Social" ng-required="true">
+        </div>
+
+
 
         <!-- ui-date para utilizar a mask -->
         <input class="form-control" type="text" ng-model="contato.data" name="data" placeholder="Data" ui-date>

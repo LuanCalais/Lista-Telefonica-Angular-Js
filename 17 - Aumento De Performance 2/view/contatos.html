@@ -1,4 +1,24 @@
+<!-- Demonstração de atenção com ng-if e ng-show
+    o ng-show já carrega o elemento na dom e o esconde com display: none
+-->
+<button ng-click="showImage=!showImage">Show/Hide Image</button>
+<div ng-show="showImage">
+    <img src="../img/Capa de stories .jpg" alt="">
+</div>
+
+<!-- 
+    O ng-if apenas interage com a dom se a condicional permitir
+ -->
+<button ng-click="ifImage=!ifImage">Show/Hide Image</button>
+<div ng-if="ifImage">
+    <img ng-src="../img/Capa de stories .jpg" alt="">
+    <!-- OBS sem o ng-src ele carrega o recurso como o ng-show, pois o navegador não conhece ng-if no começo
+    e ele é mais rápido, para isso definimos ng-src para que ele interprete isso primeiro -->
+</div>
+
 <div class="jumbotron">
+    <!-- Interpolação da variável app para demonstração da perda de performance com filtros -->
+    {{app | upper}}
 
     <ui-acordions>
 

@@ -23,16 +23,17 @@
 	<script src="lib/angular/angular-route.js"></script>
 	<script src="js/controllers/novoContatoCtrl.js"></script>
 	<script src="js/controllers/detalhesContatoCtrl.js"></script>
-
-	<!-- Inportações de Interceptors e arquivos de configuração -->
 	<script src="js/interceptors/timesStampInterceptor.js"></script>
 	<script src="js/config/interceptorsConfig.js"></script>
 	<script src="js/interceptors/errorInterceptor.js"></script>
 	<script src="js/interceptors/loadingInterceptor.js"></script>
 
+	<!-- Filtro para teste de desempenho -->
+	<script src="js/filters/upperFilter.js"></script>
+
 	<!-- 
 		
-		EXEMPLOS ESTÃO EM contatos.html e listaTelefonicaCtrl.js
+		EXEMPLOS ESTÃO EM contatos.html, listaTelefonicaCtrl.js e upperFilter, novoContato.html
 
 		TRACK BY - Sempre defina um quando utilizar ng-repeat e ng-options
 		Sem o track by o angular força uma interação com os elementos o que causa lentidão, com o track by ele só executa uma vez 
@@ -42,7 +43,15 @@
 		adicionando o novo elemento, com o track by os outros contatos já estão salvos, e executados, sem ele, o angular executará 
 		tudo outra vez para poder adicionar o novo contato
 
-		FILTROS - Analise o impacto de aplicar os filtros diretamente (Parei em 5:41)
+		FILTROS - Analise o impacto de aplicar os filtros diretamente 
+
+		NG-IF E NG-SHOW - Pensar bem antes de usa-los,
+		ng-if - interagem com a DOM adiciona e remove elementos (-rápido, mais watchers)
+		ng-show - manipula propriedades para alterar a visibilidade do elemento, como o display no css(+rápido, menos wathcers)
+		OBS: Se sua aplicação carrega recursos CONDICIONALMENTE, um iframe, uma imagem, um vídeo etc. É melhor usar o ng-if
+		pois independentemente da condição ele já estará carregado e escondido com display, se for carregado com ng-show 
+		com ng-if ele passa existir apenas depois(demonstração em contatos.html)
+		ng-src - garante que o recurso e o navegador estarão alinhados, em ng-if
 		
 	 -->
 

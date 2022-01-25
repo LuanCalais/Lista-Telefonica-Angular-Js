@@ -1,5 +1,7 @@
-angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope, contatos, operadoras, serialGenerator) {
-	$scope.app = "Lista Telefonica";
+angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope, contatos, operadoras, serialGenerator, $filter) {
+	// Solução de sobrecarga de filter, tirar ele da view e manter na controller
+	// Chama esse filtro apenas uma vez independente da interação com o aplicativo
+	$scope.app = $filter('upper')("Lista Telefonica");
 	$scope.contatos = [];
 	$scope.operadoras = operadoras.data;
 	$scope.contato = contatos.data;
